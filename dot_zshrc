@@ -69,12 +69,5 @@ fi
 source "$OMARCHY_PATH/default/bash/rc" 2>/dev/null
 
 # --- dotfiles sync (chezmoi): capture changes, commit and push ---
-# Usage: gassync [commit message]
-dgsync() {
-  local msg="${1:-sync dotfiles}"
-  chezmoi re-add || return 1
-  git -C "$HOME/.local/share/chezmoi" add -A || return 1
-  git -C "$HOME/.local/share/chezmoi" commit -m "$msg" || return 1
-  git -C "$HOME/.local/share/chezmoi" push || return 1
-}
-alias gassync='dgsync'
+# Usage: gassync [commit message]  (backed by ~/.local/bin/dotfs)
+alias gassync='dotfs'
