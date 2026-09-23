@@ -3,31 +3,34 @@ layout {
         children
         pane size=1 borderless=true {
             plugin location="file:~/.config/zellij/plugins/zjstatus.wasm" {
-                format_left   "{mode} #[fg=#89B4FA,bold]{session}"
+                format_left   "{mode} {session}"
                 format_center "{tabs}"
                 format_right  "{command_git_branch} {datetime}"
-                format_space  ""
+                format_space  " "
 
                 border_enabled  "true"
                 border_char     "━"
-                border_format   "#[fg=#45475A]{char}"
+                border_format   "#[fg=#313244]{char}"
                 border_position "top"
 
                 hide_frame_for_single_pane "true"
 
-                mode_normal  "#[bg=#585B70,fg=#181825,bold] N "
-                mode_tmux    "#[bg=#FAB387,fg=#181825,bold] T "
+                mode_normal  "#[bg=#89B4FA,fg=#181825,bold] ◉ N "
+                mode_tmux    "#[bg=#FAB387,fg=#181825,bold] ⌘ T "
 
-                tab_normal   "#[fg=#A6ADC8] {name} "
-                tab_active   "#[bg=#313244,fg=#CDD6F4,bold] {name} "
+                session      "#[bg=#181825,fg=#89B4FA,bold] {name} "
+                session_name "{name}"
+
+                tab_normal   "#[bg=#313244,fg=#A6ADC8] {name} "
+                tab_active   "#[bg=#585B70,fg=#FFFFFF,bold] {name} "
 
                 command_git_branch_command     "git rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''"
-                command_git_branch_format      "#[fg=#A6E3A1] {stdout} "
+                command_git_branch_format      "#[bg=#181825,fg=#A6E3A1,bold]  {stdout}"
                 command_git_branch_interval    "10"
                 command_git_branch_rendermode  "static"
 
-                datetime        "#[fg=#A6ADC8,bold] {format}"
-                datetime_format "%H:%M %d/%m"
+                datetime        "#[bg=#181825,fg=#A6ADC8,bold] {format}"
+                datetime_format " %H:%M %d/%m"
             }
         }
     }
