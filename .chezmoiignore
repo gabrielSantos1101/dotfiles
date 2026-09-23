@@ -1,0 +1,42 @@
+# Files that must NEVER be applied and never land in the repo.
+# Keep it minimal and obvious: secrets and machine-specific state.
+
+# --- Secrets / credentials ---
+.ssh
+.gnupg
+.aws
+.azure
+.kube
+.netrc
+dot_config/gh
+dot_config/yay
+dot_config/herdr
+dot_config/vicinae
+dot_config/opencode
+dot_config/openai
+dot_config/mise/auth.toml
+
+# --- Machine-specific / volatile state ---
+dot_config/dconf
+dot_config/systemd
+dot_config/fastfetch
+dot_config/mimeapps.list
+dot_config/user-dirs.dirs
+dot_config/pulse
+dot_config/wireplumber
+dot_config/environment.d
+
+# --- Browsers and app caches ---
+dot_config/BraveSoftware
+dot_config/chromium
+dot_config/chromium-flags.conf
+dot_config/google-chrome
+dot_config/google-chrome-beta
+dot_config/google-chrome-unstable
+dot_config/microsoft-edge
+dot_config/microsoft-edge-dev
+
+# --- Repo-internal files: never applied to $HOME ---
+.chezmoiignore
+README.md
+setup
