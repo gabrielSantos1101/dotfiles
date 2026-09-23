@@ -15,21 +15,21 @@ layout {
 
                 hide_frame_for_single_pane "true"
 
-                mode_normal  "#[bg=#89B4FA,fg=#181825,bold] ◉ N "
-                mode_tmux    "#[bg=#FAB387,fg=#181825,bold] ⌘ T "
+                mode_normal  "#[bg=#94E2D5,fg=#11111B,bold] N "
+                mode_tmux    "#[bg=#FAB387,fg=#11111B,bold] T "
 
-                session      "#[bg=#181825,fg=#89B4FA,bold] {name} "
-                session_name "{name}"
+                session      "#[fg=#89B4FA,bold] {name} "
 
-                tab_normal   "#[bg=#313244,fg=#A6ADC8] {name} "
-                tab_active   "#[bg=#585B70,fg=#FFFFFF,bold] {name} "
+                tab_normal   "#[fg=#6C7086] {index} {name} "
+                tab_active   "#[bg=#89B4FA,fg=#11111B,bold] {index} {name} "
+                tab_separator " "
 
                 command_git_branch_command     "git rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''"
-                command_git_branch_format      "#[bg=#181825,fg=#A6E3A1,bold]  {stdout}"
+                command_git_branch_format      "#[fg=#A6E3A1,bold]  {stdout}"
                 command_git_branch_interval    "10"
                 command_git_branch_rendermode  "static"
 
-                datetime        "#[bg=#181825,fg=#A6ADC8,bold] {format}"
+                datetime        "#[fg=#A6ADC8,bold] {format}"
                 datetime_format " %H:%M %d/%m"
             }
         }
