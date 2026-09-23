@@ -1,6 +1,6 @@
-// Zellij config — matches the Omarchy tokyo-night system theme.
-// Built-in tokyo-night theme: full palette, so plugins (tabs, status) render rich.
-theme "tokyo-night"
+// Zellij config — catppuccin-mocha theme.
+// Built-in theme with full palette, so plugins (tabs, status) render rich.
+theme "catppuccin-mocha"
 
 // Main tab bar on top (tabs look), status bar at the bottom (tmux-like).
 plugins {
