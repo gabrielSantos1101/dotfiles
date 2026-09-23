@@ -2,15 +2,8 @@
 // Built-in theme with full palette, so plugins (tabs, status) render rich.
 theme "catppuccin-mocha"
 
-// Main tab bar on top (tabs look), status bar at the bottom (tmux-like).
-plugins {
-    tab-bar location="zellij:tab-bar" {
-        position "top"
-    }
-    status-bar location="zellij:status-bar" {
-        position "bottom"
-    }
-}
+// Custom chrome lives in layouts/default.kdl (zjstatus tab bar).
+default_layout "default"
 
 // General settings
 scroll_buffer_size 50000
