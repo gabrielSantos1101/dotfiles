@@ -1,0 +1,34 @@
+// Omarchy Tokyo Night theme (matches the system theme colors)
+theme "tokyo-night"
+
+themes {
+    tokyo-night {
+        fg 169 177 214
+        bg 26 27 38
+        red 247 118 142
+        green 158 206 106
+        yellow 224 175 104
+        blue 122 162 247
+        magenta 173 142 230
+        orange 156 96 126
+        cyan 68 157 171
+        black 19 20 28
+        white 201 203 218
+    }
+}
+
+// Status bars at the top (like the tmux setup)
+plugins {
+    tab-bar location="zellij:tab-bar" {
+        position "top"
+    }
+    status-bar location="zellij:status-bar" {
+        position "top"
+    }
+}
+
+// General settings
+scroll_buffer_size 50000
+mouse_mode true
+pane_frames true
+simplified_ui true
