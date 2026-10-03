@@ -58,7 +58,8 @@ pm_installed() {
 want_pkgs=(
   "zsh"
   "fzf" "zoxide" "bat" "eza" "ripgrep" "fd" "starship"
-  "git" "curl" "tmux"
+  "zellij" "tmux"
+  "git" "curl"
 )
 
 log "package manager: $pm"
