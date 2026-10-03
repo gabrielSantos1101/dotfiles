@@ -11,6 +11,21 @@ autoload -Uz compinit && compinit
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
+# --- navegação sem 'cd': digita o nome da pasta e entra direto (AUTO_CD nativo do zsh) ---
+setopt AUTO_CD
+# pilha de diretórios: 'cd -' volta pro anterior, como no bash
+setopt AUTO_PUSHD
+cdpath=("$HOME" $cdpath)
+
+# --- histórico: precisa Gravar p/ o zsh-autosuggestions ter o que sugerir ---
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt appendhistory      # grava no arquivo a cada comando
+setopt sharehistory        # mantém histórico compartilhado entre shells/zellij
+setopt hist_ignore_all_dups
+setopt hist_ignore_space   # comando começando com espaço não entra no histórico
+
 # --- fzf (Ctrl+T / Ctrl+R / Alt+C — the same omarchy bash integration) ---
 if command -v fzf >/dev/null 2>&1; then
   export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null | head -200'"
@@ -65,9 +80,17 @@ if [[ -z "$ZELLIJ" ]] && command -v zellij >/dev/null 2>&1 && [[ -n $PS1 ]]; the
   exec zellij
 fi
 
-# --- Omarchy aliases/functions de shell (rc oficial do omarchy para zsh default) ---
-source "$OMARCHY_PATH/default/bash/rc" 2>/dev/null
+# --- starship prompt initialization ---
+eval "$(starship init zsh)"
+
+# NOTE: the omarchy bash rc is intentionally NOT sourced here.
+# Sourcing bash's rc into zsh injects a bash-syntax PS1 (renders as literal
+# \[\] in zsh, which uses %{}), loads bash-completion over zsh's native
+# completion (breaks `cd dir<TAB>` without a trailing slash), and clobbers
+# compinit so fresh shells lose the completion cache.
 
 # --- dotfiles sync (chezmoi): capture changes, commit and push ---
-# Usage: gassync [commit message]  (backed by ~/.local/bin/dotfs)
+# dotfs ja faz o trabalho todo (re-add, commit, pull --rebase, push).
+# Com argumento: dotfs "mensagem"   |   sem argumento: abre o editor pro commit.
+alias gs='dotfs'
 alias gassync='dotfs'
