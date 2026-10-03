@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# dotcheck — verify the dev environment has everything the dotfiles depend on.
+#
+# Usage:
+#   dotcheck            # report what is missing (read-only, installs nothing)
+#   dotcheck --install  # report, then install the missing packages with pacman
+#
+# Checks three things:
+#   1. required packages  (zsh, fzf, zoxide, ... — what the .zshrc sources)
+#   2. login shell        (zsh as the default shell for the current user)
+#   3. services           (sshd, and the ufw rules the remote access needs)
+set -uo pipefail
+
+install=0
+[[ "${1:-}" == "--install" ]] && install=1
+
+# Required for the .zshrc to fully work: plugins it sources + tools it calls.
+packages=(
+  zsh zsh-autosuggestions zsh-syntax-highlighting zsh-completions
+  fzf zoxide bat eza fd ripgrep starship zellij
+  mise git lazygit btop tldr
+)
+
+missing=()
+for p in "${packages[@]}"; do
+  pacman -Qq "$p" >/dev/null 2>&1 || missing+=("$p")
+done
+
+echo "=== packages ==="
+if [[ ${#missing[@]} -eq 0 ]]; then
+  echo "all ${#packages[@]} required packages are installed"
+else
+  echo "missing (${#missing[@]}): ${missing[*]}"
+fi
+
+echo
+echo "=== login shell ==="
+shell="$(getent passwd "$(id -un)" | cut -d: -f7)"
+if [[ "$shell" == */zsh ]]; then
+  echo "ok: $shell"
+else
+  echo "current: $shell (expected */zsh)"
+  echo "  fix: chsh -s /usr/bin/zsh $(id -un)"
+fi
+
+echo
+echo "=== services ==="
+sshd_state="$(systemctl is-active sshd 2>/dev/null || echo missing)"
+if [[ "$sshd_state" == "active" ]]; then
+  echo "sshd: active"
+else
+  echo "sshd: $sshd_state"
+  echo "  fix: sudo systemctl enable --now sshd"
+fi
+
+if systemctl is-active --quiet ufw 2>/dev/null; then
+  # 'ufw status' needs root, so ask for it quietly; if it fails we cannot tell.
+  if ufw_out="$(sudo -n ufw status 2>/dev/null)"; then
+    if grep -qE '^22/tcp[[:space:]]+ALLOW' <<<"$ufw_out"; then
+      echo "ufw: active, ssh (22/tcp) allowed"
+      ufw_ssh_ok=1
+    else
+      echo "ufw: active but ssh (22/tcp) NOT allowed"
+      echo "  fix: sudo ufw allow 22/tcp"
+      ufw_ssh_ok=0
+    fi
+  else
+    echo "ufw: active (cannot read rules without sudo; check 'sudo ufw status')"
+    ufw_ssh_ok=-1
+  fi
+else
+  echo "ufw: inactive (no firewall rules to check)"
+  ufw_ssh_ok=1
+fi
+
+echo
+if [[ ${#missing[@]} -eq 0 && "$shell" == */zsh && "$sshd_state" == "active" && "$ufw_ssh_ok" != 0 ]]; then
+  echo "result: everything in place"
+  exit 0
+fi
+
+echo "result: setup incomplete (see the fix hints above)"
+
+if [[ $install -eq 1 && ${#missing[@]} -gt 0 ]]; then
+  echo
+  echo "=== installing missing packages (sudo may ask for your password) ==="
+  sudo pacman -S --needed --noconfirm "${missing[@]}" || {
+    echo "install failed; fix the error above and re-run dotcheck" >&2
+    exit 1
+  }
+  echo "packages installed — re-run dotcheck to confirm"
+fi
+
+exit 1
