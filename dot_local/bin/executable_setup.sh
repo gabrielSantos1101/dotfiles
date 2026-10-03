@@ -17,6 +17,41 @@ log()  { printf '%s\n' "$*"; }
 warn() { printf 'warning: %s\n' "$*" >&2; }
 die()  { printf 'error: %s\n' "$*" >&2; exit 1; }
 
+# Interactive questions need a terminal; without one (CI, piped) we take the
+# default instead of hanging forever on a read.
+interactive() { [[ -t 0 && $check_only -eq 0 ]]; }
+
+ask_yes_no() { # ask_yes_no <question> <default: y|n>
+  local q="$1" def="${2:-y}" reply
+  if ! interactive; then
+    [[ "$def" == "y" ]] && return 0 || return 1
+  fi
+  local hint="[y/N]"; [[ "$def" == "y" ]] && hint="[Y/n]"
+  read -r -p "$q $hint " reply
+  reply="${reply:-$def}"
+  [[ "$reply" =~ ^[Yy] ]]
+}
+
+ask_multiplexer() {
+  # The dotfiles version configs for both zellij and tmux; ask which one the
+  # user actually wants so we do not pull in the other.
+  local reply
+  if ! interactive; then
+    echo zellij
+    return 0
+  fi
+  printf 'terminal multiplexer: zellij (recommended) or tmux? [zellij] '
+  read -r reply
+  # Normalize: take the last word so a stray leftover from the prompt line
+  # ("... ? zellij tmux") is not mistaken for the answer.
+  reply="${reply##* }"
+  reply="${reply:-zellij}"
+  case "${reply,,}" in
+    t|tmu*|tml*) echo tmux ;;
+    *)          echo zellij ;;
+  esac
+}
+
 # --- package manager ------------------------------------------------------
 # Order matters: the first one that can install a package without being
 # prompted for a package name wins.
@@ -55,10 +90,19 @@ pm_installed() {
 
 # Names differ per distro; keep a portable list with aliases.
 # "a b" means: install "a" on most, "b" as the fallback name.
+# Which multiplexer: the dotfiles carry configs for both, so only install
+# the one the user picks.
+if [[ $check_only -eq 1 ]]; then
+  mux="zellij"
+  log "multiplexer: zellij (default; run without --check to choose)"
+else
+  mux="$(ask_multiplexer)"
+fi
+
 want_pkgs=(
   "zsh"
   "fzf" "zoxide" "bat" "eza" "ripgrep" "fd" "starship"
-  "zellij" "tmux"
+  "$mux"
   "git" "curl"
 )
 

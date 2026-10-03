@@ -17,9 +17,17 @@ install=0
 # Required for the .zshrc to fully work: plugins it sources + tools it calls.
 packages=(
   zsh zsh-autosuggestions zsh-syntax-highlighting zsh-completions
-  fzf zoxide bat eza fd ripgrep starship zellij tmux
+  fzf zoxide bat eza fd ripgrep starship
   mise git lazygit btop tldr
 )
+
+# A multiplexer counts as satisfied if either one is present.
+if command -v zellij >/dev/null 2>&1 || command -v tmux >/dev/null 2>&1; then
+  mux="ok"
+else
+  mux=""
+fi
+packages+=("$mux")
 
 missing=()
 for p in "${packages[@]}"; do
