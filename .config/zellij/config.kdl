@@ -1,0 +1,11 @@
+// Zellij config — catppuccin-mocha theme.
+// Built-in theme with full palette, so plugins (tabs, status) render rich.
+theme "catppuccin-mocha"
+
+// Custom chrome lives in layouts/default.kdl (zjstatus tab bar).
+default_layout "default"
+
+// General settings
+scroll_buffer_size 50000
+mouse_mode true
+pane_frames true

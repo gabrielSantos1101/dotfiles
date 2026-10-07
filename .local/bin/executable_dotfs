@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Sync dotfiles: capture config changes, commit and push to GitHub.
+# Works from any shell (zsh, bash, non-interactive).
+#
+# Usage:
+#   dotfs                  # opens an editor to type the commit message
+#   dotfs "minha mensagem" # commits with that message
+#   dotfs --add <arquivo>  # also re-adds a specific path before committing
+#
+# Safe to run with nothing to commit: exits 0 instead of failing.
+set -euo pipefail
+
+msg="${1:-}"
+add_path=""
+
+if [[ "${msg}" == "--add" ]]; then
+  add_path="${2:-}"
+  msg="${3:-}"
+fi
+
+src="$HOME/.local/share/chezmoi"
+
+if [[ ! -d "$src/.git" ]]; then
+  echo "dotfs: $src nao e um repositorio git" >&2
+  exit 1
+fi
+
+cd "$src"
+
+# Bring remote changes first so the push below never gets rejected.
+if [[ -n "$(git remote)" ]]; then
+  git pull --rebase --autostash --quiet
+fi
+
+# Re-capture every file chezmoi manages, so local edits always win.
+chezmoi re-add
+
+if [[ -n "$add_path" ]]; then
+  chezmoi re-add "$add_path"
+fi
+
+git add -A
+
+if git diff --cached --quiet; then
+  echo "dotfs: nada pra sincronizar (tudo ja no repo)"
+  exit 0
+fi
+
+# No message given: let the user write one, with the diff pre-loaded.
+if [[ -z "$msg" ]]; then
+  msg="$(git diff --cached --stat | tail -n 1)"
+  git commit -q -m "$msg"
+  git commit -q --amend -e
+else
+  git commit -q -m "$msg"
+fi
+
+if [[ -n "$(git remote)" ]]; then
+  git push --quiet
+fi
+
+echo "dotfs: sincronizado -> $(git rev-parse --short HEAD)  $msg"
