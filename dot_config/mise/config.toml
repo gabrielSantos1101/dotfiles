@@ -1,9 +1,0 @@
-[tools]
-bun = "latest"
-codex = "latest"
-node = "26.10.0"
-opencode = "latest"
-pnpm = "latest"
-
-[settings.upgrade]
-auto_prune = false
